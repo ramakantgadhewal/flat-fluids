@@ -10,17 +10,16 @@ class Grid(object):
 
 class Image(Grid):
     def __init__(self, filepath: Path) -> None:
-        # Save parameters
-        self.filepath = filepath
-        
-        # Load from file
-        self.image = plt.imread(filepath)
-        
         # Determine key parameters
-        _shape = self.image.shape[:2]
+        __image = plt.imread(filepath)
+        __shape = __image.shape[:2]
         
         # Instantiate the superclass
-        super().__init__(_shape)
+        super().__init__(__shape)
+        
+        # Save parameters
+        self.filepath = filepath
+        self.image = __image
 
 
 if __name__ == "__main__":
@@ -30,4 +29,3 @@ if __name__ == "__main__":
     
     # Instantiate image
     image = Image(filepath)
-    image
