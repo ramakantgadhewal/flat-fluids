@@ -2,6 +2,18 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
+class DecimalFraction(float):
+    def __new__(cls, value: float) -> None:
+        # Ensure value is valid
+        if value < 0:
+            raise ValueError("Value is less than zero.")
+        elif value > 1:
+            raise ValueError("Value is greater than one.")
+        
+        # Run parent super function
+        return super().__new__(cls, value)
+
+
 class Grid(object):
     def __init__(self, shape: tuple([int, int])) -> None:
         # Save parameters
