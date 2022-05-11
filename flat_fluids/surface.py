@@ -20,6 +20,14 @@ class Image(Grid):
         # Save parameters
         self.filepath = filepath
         self.image = __image
+    
+    def plot(self) -> None:
+        """
+        Plot original image in a window.
+        """
+        
+        plt.imshow(self.image)
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -29,3 +37,6 @@ if __name__ == "__main__":
     
     # Instantiate image
     image = Image(filepath)
+
+    # Plot
+    image.plot()
