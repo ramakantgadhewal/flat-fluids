@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -19,6 +20,20 @@ class Grid(object):
         # Save parameters
         self.shape = shape
 
+    def __is_in(self, position: tuple([int, int])) -> bool:
+        """
+        Check to see if the provided position is within the shape of the grid.
+        """
+        
+        # Check each dimension of the shape
+        for idx, pos in enumerate(position):
+            # Check if position for the dimension is valid
+            if pos < 0 and pos > self.shape[idx]:
+                return False
+            
+        # Otherwise, the position is within the shape
+        return True
+
 
 class Image(Grid):
     def __init__(self, filepath: Path) -> None:
@@ -32,6 +47,9 @@ class Image(Grid):
         # Save parameters
         self.filepath = filepath
         self.image = __image
+        
+    def _surface_mask(self, position: tuple([int, int]), tolerance: DecimalFraction) -> np.ndarray:
+        pass
     
     def plot(self) -> None:
         """
