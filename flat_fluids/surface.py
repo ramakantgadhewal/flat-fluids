@@ -48,7 +48,8 @@ class Image(Grid):
         self.filepath = filepath
         self.image = __image
         
-    def _surface_mask(self, position: tuple([int, int]), tolerance: DecimalFraction) -> np.ndarray:
+    def _surface_mask(self, position: tuple([int, int]),
+                      tolerance: DecimalFraction) -> np.ndarray:
         pass
     
     def plot(self) -> None:
@@ -56,7 +57,10 @@ class Image(Grid):
         Plot original image in a window.
         """
         
+        # Add image to plot
         plt.imshow(self.image)
+        
+        # Show figure
         plt.show()
 
 
