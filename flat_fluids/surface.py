@@ -34,7 +34,7 @@ class Grid(object):
         # Save parameters
         self.shape = shape
 
-    def __is_in(self, position: Array2DIndex) -> bool:
+    def _is_in(self, position: Array2DIndex) -> bool:
         """
         Check to see if the provided position is within the shape of the grid.
         """
@@ -74,7 +74,7 @@ class Image(Grid):
         """
         
         # Ensure the pixel position is within the image
-        if not self.__is_in(position):
+        if not self._is_in(position):
             raise ValueError("Invalid position selected in the image.")
         
         # Determine the selected colour
