@@ -28,6 +28,15 @@ class Array2DIndex(tuple):
         # Run parent super function
         return super().__new__(cls, value)
 
+class RGBColour(np.ndarray):
+    def __new__(cls, value: np.ndarray) -> np.ndarray:
+        # Ensure value is valid
+        if len(value) != 3:
+            raise ValueError("Value must be contain 3 elements.")
+        
+        # Return array with correct data types
+        return np.array([DecimalFraction(x) for x in value])
+
 
 class Grid(object):
     def __init__(self, shape: Array2DIndex) -> None:
@@ -62,7 +71,8 @@ class Image(Grid):
         self.filepath = filepath
         self.image = __image
         
-    # def __colour_diff()
+    def __colour_diff(rgb1, rgb2):
+        pass
         
     def _surface_mask(self, position: Array2DIndex,
                       tolerance: DecimalFraction) -> np.ndarray:
@@ -78,9 +88,7 @@ class Image(Grid):
             raise ValueError("Invalid position selected in the image.")
         
         # Determine the selected colour
-        colour = self.image[position]
-        
-        
+        colour = RGBColour(self.image[position])
     
     def plot(self) -> None:
         """
@@ -103,7 +111,7 @@ if __name__ == "__main__":
     image = Image(filepath)
 
     # Plot
-    image.plot()
+    # image.plot()
     
     # Determine position of fluid
     image._surface_mask((0, 0), 0.1)
