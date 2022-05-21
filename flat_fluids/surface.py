@@ -71,8 +71,26 @@ class Image(Grid):
         self.filepath = filepath
         self.image = __image
         
-    def __colour_diff(rgb1, rgb2):
-        pass
+    @staticmethod
+    def _colour_diff(rgb1: RGBColour, rgb2: RGBColour) -> DecimalFraction:
+        """
+        Calculates a quantifiable similarity metric between two RGB colours
+        using a combination of two weighted Euclidean distance functions.
+        """
+        
+        # Calculate component differences
+        rgb_diff = rgb1 - rgb2
+        
+        # Calculate component means
+        rgb_mean = np.mean([rgb1, rgb2], axis=0)
+        
+        # Calculate similarity metric
+        diff = np.sqrt(rgb_diff[0]**2 * (2 + rgb_mean[0]) +
+                       rgb_diff[1]**2 * 4 +
+                       rgb_diff[2]**2 * (3 - rgb_mean[0])) / 3
+        
+        # Return colour difference
+        return DecimalFraction(diff)
         
     def _surface_mask(self, position: Array2DIndex,
                       tolerance: DecimalFraction) -> np.ndarray:
@@ -89,6 +107,9 @@ class Image(Grid):
         
         # Determine the selected colour
         colour = RGBColour(self.image[position])
+        
+        # Calculate colour difference
+        self._colour_diff(RGBColour([1, 1, 1]), RGBColour([0, 0, 0]))
     
     def plot(self) -> None:
         """
