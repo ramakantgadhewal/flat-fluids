@@ -28,9 +28,12 @@ class Array2DIndex(tuple):
         # Run parent super function
         return super().__new__(cls, value)
 
+
 class RGBColour(np.ndarray):
     def __new__(cls, value: np.ndarray) -> np.ndarray:
         # Ensure value is valid
+        if len(np.shape(value)) != 1:
+            raise ValueError("Value must only contain a single dimension.")
         if len(value) != 3:
             raise ValueError("Value must be contain 3 elements.")
         
@@ -108,8 +111,8 @@ class Image(Grid):
         # Determine the selected colour
         colour = RGBColour(self.image[position])
         
-        # Calculate colour difference
-        self._colour_diff(RGBColour([1, 1, 1]), RGBColour([0, 0, 0]))
+        # Calculate colour difference for image
+        colour_diff = self._colour_diff(self.image, colour)
     
     def plot(self) -> None:
         """
