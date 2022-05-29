@@ -41,6 +41,18 @@ class RGBColour(np.ndarray):
         return np.array([DecimalFraction(x) for x in value])
 
 
+class Mask2D(np.ndarray):
+    def __new__(cls, value: np.ndarray) -> np.ndarray:
+        # Ensure value is valid
+        if len(np.shape(value)) != 2:
+            raise ValueError("Value must contain only two dimensions.")
+        if any(np.isnan(value)):
+            raise ValueError("Value must not contain NaNs.")
+        
+        # Return array of Booleans
+        return np.array([bool(x) for x in value])
+    
+    
 class Grid(object):
     def __init__(self, shape: Array2DIndex) -> None:
         # Save parameters
@@ -96,7 +108,7 @@ class Image(Grid):
         return DecimalFraction(diff)
         
     def _surface_mask(self, position: Array2DIndex,
-                      tolerance: DecimalFraction) -> np.ndarray:
+                      tolerance: DecimalFraction) -> Mask2D:
         """
         Generate a mask of Booleans to indicate connected pixels in the image
         with a colour similar to that of a selected pixel. The tolerance
