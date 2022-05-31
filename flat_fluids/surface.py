@@ -3,34 +3,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class DecimalFraction(float):
+class DecimalFraction(type):
     def __new__(cls, value: float) -> float:
         # Ensure value is valid
-        if value < 0:
+        if np.any(value < 0):
             raise ValueError("Value is less than zero.")
-        elif value > 1:
+        elif np.any(value > 1):
             raise ValueError("Value is greater than one.")
         
-        # Run parent super function
-        return super().__new__(cls, value)
+        # Return decimal fraction value
+        return value
 
 
-class Array2DIndex(tuple):
+class Index2D(type):
     def __new__(cls, value: tuple) -> tuple:
         # Ensure value is valid
         if len(value) != 2:
-            raise ValueError("Value must be contain 2 elements.")
+            raise ValueError("Value must contain 2 elements.")
         if not all(isinstance(element, int) for element in value):
-            raise ValueError("Value must contain only ints.")
+            raise ValueError("Value must contain only integers.")
         if any(element < 0 for element in value):
             raise ValueError("Value must only contain positive numbers.")
         
-        # Run parent super function
-        return super().__new__(cls, value)
+        # Return 2D index as a tuple
+        return tuple(value)
 
 
-class RGBColour(np.ndarray):
-    def __new__(cls, value: np.ndarray) -> np.ndarray:
+class RGBColour(type):
+    def __new__(cls, value: tuple) -> tuple:
         # Ensure value is valid
         if len(np.shape(value)) != 1:
             raise ValueError("Value must only contain a single dimension.")
@@ -38,27 +38,27 @@ class RGBColour(np.ndarray):
             raise ValueError("Value must be contain 3 elements.")
         
         # Return array with correct data types
-        return np.array([DecimalFraction(x) for x in value])
+        return DecimalFraction(value)
 
 
-class Mask2D(np.ndarray):
+class Mask2D(type):
     def __new__(cls, value: np.ndarray) -> np.ndarray:
         # Ensure value is valid
         if len(np.shape(value)) != 2:
-            raise ValueError("Value must contain only two dimensions.")
-        if any(np.isnan(value)):
+            raise ValueError("Value must contain two dimensions.")
+        if np.any(np.isnan(value)):
             raise ValueError("Value must not contain NaNs.")
         
         # Return array of Booleans
-        return np.array([bool(x) for x in value])
+        return np.bool_(value)
     
     
 class Grid(object):
-    def __init__(self, shape: Array2DIndex) -> None:
+    def __init__(self, shape: Index2D) -> None:
         # Save parameters
         self.shape = shape
 
-    def _is_in(self, position: Array2DIndex) -> bool:
+    def _is_in(self, position: Index2D) -> bool:
         """
         Check to see if the provided position is within the shape of the grid.
         """
@@ -107,7 +107,7 @@ class Image(Grid):
         # Return colour difference
         return DecimalFraction(diff)
         
-    def _surface_mask(self, position: Array2DIndex,
+    def _surface_mask(self, position: Index2D,
                       tolerance: DecimalFraction) -> Mask2D:
         """
         Generate a mask of Booleans to indicate connected pixels in the image
@@ -124,7 +124,10 @@ class Image(Grid):
         colour = RGBColour(self.image[position])
         
         # Calculate colour difference for image
-        colour_diff = self._colour_diff(self.image, colour)
+        self._colour_diff(self.image, self.image)
+        colour_diff = np.array(list(map(lambda x: self._colour_diff(x, colour), self.image)))
+        
+        return False # TODO: fix. Mask2D(self._colour_diff(colour) <= tolerance)
     
     def plot(self) -> None:
         """
