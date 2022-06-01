@@ -97,12 +97,15 @@ class Image(Grid):
         rgb_diff = rgb1 - rgb2
         
         # Calculate component means
-        rgb_mean = np.mean([rgb1, rgb2], axis=0)
+        rgb_mean = np.mean(np.broadcast_arrays(rgb1, rgb2), axis=0)
+        
+        # Calculate component weights
+        weights = np.stack([2 + rgb_mean[..., 0],
+                            np.full(np.shape(rgb_mean[..., 0]), 4),
+                            3 - rgb_mean[..., 0]], axis=-1)
         
         # Calculate similarity metric
-        diff = np.sqrt(rgb_diff[0]**2 * (2 + rgb_mean[0]) +
-                       rgb_diff[1]**2 * 4 +
-                       rgb_diff[2]**2 * (3 - rgb_mean[0])) / 3
+        diff = np.sqrt(np.sum(np.square(rgb_diff) * weights, axis=-1)) / 3
         
         # Return colour difference
         return DecimalFraction(diff)
@@ -123,11 +126,10 @@ class Image(Grid):
         # Determine the selected colour
         colour = RGBColour(self.image[position])
         
-        # Calculate colour difference for image
-        self._colour_diff(self.image, self.image)
-        colour_diff = np.array(list(map(lambda x: self._colour_diff(x, colour), self.image)))
+        # Return colour difference for image against selected pixel
+        colour_diff = self._colour_diff(self.image, colour)
         
-        return False # TODO: fix. Mask2D(self._colour_diff(colour) <= tolerance)
+        return Mask2D(colour_diff <= tolerance)
     
     def plot(self) -> None:
         """
@@ -153,4 +155,6 @@ if __name__ == "__main__":
     # image.plot()
     
     # Determine position of fluid
-    image._surface_mask((0, 0), 0.1)
+    mask = image._surface_mask((0, 0), 0.1)
+    
+    plt.imshow(mask)
