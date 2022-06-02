@@ -1,5 +1,6 @@
 from pathlib import Path
 import numpy as np
+import scipy.ndimage.measurements as sci_measure
 import matplotlib.pyplot as plt
 
 
@@ -129,7 +130,26 @@ class Image(Grid):
         # Return colour difference for image against selected pixel
         colour_diff = self._colour_diff(self.image, colour)
         
-        return Mask2D(colour_diff <= tolerance)
+        # Determine pixel index for colours within the tolerance
+        colour_mask = Mask2D(colour_diff <= tolerance)
+        
+        # Return mask with only the connected elements
+        return self._remove_disconnected(colour_mask, position)
+    
+    def _remove_disconnected(self, mask: Mask2D, position:Index2D) -> Mask2D:
+        """
+        Remove any elements from the provided mask that are not connected to
+        the specified position through any additional surrounding elements.
+        """
+        
+        # Define the required connection pattern
+        pattern = np.ones((3, 3), dtype=np.int)
+        
+        # Determine connected groups
+        group_mask = sci_measure.label(mask, pattern)[0]
+        
+        # Return mask of group connected to specified position
+        return Mask2D(group_mask == group_mask[position])
     
     def plot(self) -> None:
         """
