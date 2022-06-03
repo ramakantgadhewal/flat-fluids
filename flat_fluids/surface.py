@@ -1,6 +1,6 @@
 from pathlib import Path
 import numpy as np
-import scipy.ndimage.measurements as sci_measure
+import scipy.ndimage as sci_image
 import matplotlib.pyplot as plt
 
 
@@ -58,6 +58,9 @@ class Grid(object):
     def __init__(self, shape: Index2D) -> None:
         # Save parameters
         self.shape = shape
+        
+        # Define additional parameters
+        self.valid = np.full(shape, True)
 
     def _is_in(self, position: Index2D) -> bool:
         """
@@ -143,13 +146,26 @@ class Image(Grid):
         """
         
         # Define the required connection pattern
-        pattern = np.ones((3, 3), dtype=np.int)
+        pattern = np.full([3, 3], True)
         
         # Determine connected groups
-        group_mask = sci_measure.label(mask, pattern)[0]
+        group_mask = sci_image.label(mask, pattern)[0]
         
         # Return mask of group connected to specified position
         return Mask2D(group_mask == group_mask[position])
+    
+    def update_validity_mask(self, position: Index2D,
+                             tolerance: DecimalFraction = 0.01) -> None:
+        """
+        Generates and updates the surface mask of the image by comparing the
+        colours in the image with the colour of a specified pixel.
+        """
+        
+        # Generate surface mask
+        mask = self._surface_mask(position, tolerance)
+        
+        # Update valid elements in the grid
+        self.valid = mask
     
     def plot(self) -> None:
         """
@@ -170,11 +186,8 @@ if __name__ == "__main__":
     
     # Instantiate image
     image = Image(filepath)
-
-    # Plot
-    # image.plot()
     
-    # Determine position of fluid
-    mask = image._surface_mask((0, 0), 0.1)
+    # Update grid to indicate fluid locations
+    image.update_validity_mask((0, 0), 0.1)
     
-    plt.imshow(mask)
+    plt.imshow(image.valid)
