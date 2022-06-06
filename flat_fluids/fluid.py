@@ -2,6 +2,16 @@ import numpy as np
 import surface as sf
 
 
+class Array2D(object):
+    def __new__(cls, value: np.ndarray) -> np.ndarray:
+        # Ensure value is valid
+        if len(np.shape(value)) != 2:
+            raise ValueError("Value must contain two dimensions.")
+
+        # Return array
+        return value
+
+
 class Fluid(object):
     def __init__(self, grid: sf.Grid, gamma: float) -> None:
         # Save parameters
