@@ -55,12 +55,15 @@ class Mask2D(type):
     
     
 class Grid(object):
-    def __init__(self, shape: Index2D) -> None:
+    def __init__(self, shape: Index2D, scale: float = 1.0) -> None:
         # Save parameters
         self.shape = shape
+        self.scale = scale
         
         # Define additional parameters
         self.valid = np.full(shape, True)
+        self.dx = self._cell_length()
+        self.dy = self._cell_length()
 
     def _is_in(self, position: Index2D) -> bool:
         """
@@ -75,6 +78,17 @@ class Grid(object):
             
         # Otherwise, the position is within the shape
         return True
+
+    def _cell_length(self) -> float:
+        """
+        Calculates the length of a cell in the grid by scaling the largest
+        dimension in the image according to the grid scale.
+        """
+        
+        # Determine the number of pixels in the largest dimension
+        max_length = max(self.shape)
+        
+        return self.scale / max_length
 
 
 class Image(Grid):
