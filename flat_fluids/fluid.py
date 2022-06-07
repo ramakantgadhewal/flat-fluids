@@ -39,10 +39,21 @@ class Fluid(object):
         self.gamma = gamma
         
         # Create 2D arrays of initial fluid variables
-        self.density = np.full(self.grid.shape, 1.2)
-        self.pressure = np.full(self.grid.shape, 1.01325)
-        self.x_velocity = np.full(self.grid.shape, 0)
-        self.y_velocity = np.full(self.grid.shape, 0)
+        self.density = self.__create_flat_array(1.2)
+        self.pressure = self.__create_flat_array(1.01325)
+        self.x_velocity = self.__create_flat_array(0)
+        self.y_velocity = self.__create_flat_array(0)
+
+    def __create_flat_array(self, value: float):
+        """
+        Creates a flat 2D array filled with a specifed value.
+        """
+        
+        # Create array
+        array = np.full(self.grid.shape, value)
+        
+        # Return array
+        return Array2D(array, self.grid.dx, self.grid.dy)
 
 
 if __name__ == "__main__":
