@@ -17,6 +17,7 @@ class Array2D(object):
         
         # Determine additional parameters
         self.shape = np.shape(value)
+        self.cell_area = self._cell_area()
 
     def x_gradient(self) -> np.ndarray:
         """
@@ -31,6 +32,13 @@ class Array2D(object):
         """
         
         return np.gradient(self.value, self.dy, axis=1)
+    
+    def _cell_area(self) -> float:
+        """
+        Calulates the area of each cell within the grid.
+        """
+        
+        return self.dx * self.dy
 
 class Fluid(object):
     def __init__(self, grid: sf.Grid, gamma: float) -> None:
@@ -54,6 +62,13 @@ class Fluid(object):
         
         # Return array
         return Array2D(array, self.grid.dx, self.grid.dy)
+
+    def _update_density(self, mass: Array2D) -> None:
+        """
+        Calculates and updates the density array using an array of cell masses.
+        """
+        
+        # 
 
 
 if __name__ == "__main__":
