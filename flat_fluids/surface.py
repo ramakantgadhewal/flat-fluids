@@ -64,6 +64,7 @@ class Grid(object):
         self.valid = np.full(shape, True)
         self.dx = self._cell_length()
         self.dy = self._cell_length()
+        self.cell_area = self._cell_area()
 
     def _is_in(self, position: Index2D) -> bool:
         """
@@ -89,6 +90,14 @@ class Grid(object):
         max_length = max(self.shape)
         
         return self.scale / max_length
+
+    def _cell_area(self) -> float:
+        """
+        Calculates the total area of each cell within the grid.
+        """
+        
+        # Return cell area
+        return self.dx * self.dy
 
 
 class Image(Grid):
