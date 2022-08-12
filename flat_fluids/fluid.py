@@ -68,7 +68,8 @@ class Fluid(object):
         Calculates and updates the density array using an array of cell masses.
         """
         
-        # 
+        # Update density array
+        self.density = mass / self.grid.cell_area
 
 
 if __name__ == "__main__":
