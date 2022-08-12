@@ -52,7 +52,7 @@ class Fluid(object):
         self.x_velocity = self.__create_flat_array(0)
         self.y_velocity = self.__create_flat_array(0)
 
-    def __create_flat_array(self, value: float):
+    def __create_flat_array(self, value: float) -> Array2D:
         """
         Creates a flat 2D array filled with a specifed value.
         """
