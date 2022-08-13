@@ -68,7 +68,11 @@ class Fluid(object):
         Calculates a density array using an array of cell masses.
         """
         
-        return self.__array(mass / self.grid.cell_area)
+        # Calculate density
+        density = mass / self.grid.cell_area
+        
+        # Return as an array object
+        return self.__array(density)
 
     def _velocity(self, momentum: Array2D, density: Array2D) -> Array2D:
         """
@@ -76,7 +80,25 @@ class Fluid(object):
         vector array and a density array.
         """
         
-        return self.__array(momentum / (density * self.grid.cell_area))
+        # Calculate velocity
+        velocity = momentum / (density * self.grid.cell_area)
+        
+        # Return as an array object
+        return self.__array(velocity)
+
+    def _pressure(self, energy: Array2D, density: Array2D, x_velocity: Array2D,
+                  y_velocity: Array2D):
+        """
+        Calculates the pressure array using the energy, density and velocity
+        vector arrays.
+        """
+        
+        # Calculate pressure
+        pressure = (energy / self.grid.cell_area - 0.5 * density *
+                    (x_velocity**2 + y_velocity**2)) * (self.gamma - 1)
+        
+        # Return as an array object
+        return self.__array(pressure)
 
 
 if __name__ == "__main__":
