@@ -89,6 +89,7 @@ class Grid(object):
         # Determine the number of pixels in the largest dimension
         max_length = max(self.shape)
         
+        # Return cell length
         return self.scale / max_length
 
     def _cell_area(self) -> float:
@@ -213,4 +214,5 @@ if __name__ == "__main__":
     # Update grid to indicate fluid locations
     image.update_validity_mask((0, 0), 0.1)
     
+    # Plot validity mask
     plt.imshow(image.valid)
