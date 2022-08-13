@@ -17,7 +17,6 @@ class Array2D(object):
         
         # Determine additional parameters
         self.shape = np.shape(value)
-        self.cell_area = self._cell_area()
 
     def x_gradient(self) -> np.ndarray:
         """
@@ -32,13 +31,7 @@ class Array2D(object):
         """
         
         return np.gradient(self.value, self.dy, axis=1)
-    
-    def _cell_area(self) -> float:
-        """
-        Calulates the area of each cell within the grid.
-        """
-        
-        return self.dx * self.dy
+
 
 class Fluid(object):
     def __init__(self, grid: sf.Grid, gamma: float) -> None:
@@ -52,24 +45,38 @@ class Fluid(object):
         self.x_velocity = self.__create_flat_array(0)
         self.y_velocity = self.__create_flat_array(0)
 
+    def __array(self, values: np.ndarray) -> Array2D:
+        """
+        Creates a flat 2D array from a predefined array of data.
+        """
+        
+        return Array2D(values, self.grid.dx, self.grid.dy)
+
     def __create_flat_array(self, value: float) -> Array2D:
         """
         Creates a flat 2D array filled with a specifed value.
         """
         
-        # Create array
+        # Create array filled with the specified value
         array = np.full(self.grid.shape, value)
         
         # Return array
-        return Array2D(array, self.grid.dx, self.grid.dy)
+        return self.__array(array)
 
-    def _update_density(self, mass: Array2D) -> None:
+    def _density(self, mass: Array2D) -> Array2D:
         """
-        Calculates and updates the density array using an array of cell masses.
+        Calculates a density array using an array of cell masses.
         """
         
-        # Update density array
-        self.density = mass / self.grid.cell_area
+        return self.__array(mass / self.grid.cell_area)
+
+    def _velocity(self, momentum: Array2D, density: Array2D) -> Array2D:
+        """
+        Calculates a partial velocity vector array using a partial momentum
+        vector array and a density array.
+        """
+        
+        return self.__array(momentum / (density * self.grid.cell_area))
 
 
 if __name__ == "__main__":
