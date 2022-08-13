@@ -2,37 +2,6 @@ import numpy as np
 import surface as sf
 
 
-class Array2D(object):
-    def __init__(self, value: np.ndarray, dx: float, dy: float) -> None:
-        # Ensure parameters are valid
-        if len(np.shape(value)) != 2:
-            raise ValueError("Value must contain two dimensions.")
-        if (dx <= 0) or (dy <= 0):
-            raise ValueError("Cell lengths must be a real positive number.")
-        
-        # Save parameters
-        self.value = value
-        self.dx = dx
-        self.dy = dy
-        
-        # Determine additional parameters
-        self.shape = np.shape(value)
-
-    def x_gradient(self) -> np.ndarray:
-        """
-        Calculates the gradient of the 2D array in the x dimension.
-        """
-        
-        return np.gradient(self.value, self.dx, axis=0)
-
-    def y_gradient(self) -> np.ndarray:
-        """
-        Calculates the gradient of the 2D array in the y dimension.
-        """
-        
-        return np.gradient(self.value, self.dy, axis=1)
-
-
 class Fluid(object):
     def __init__(self, grid: sf.Grid, gamma: float) -> None:
         # Save parameters
@@ -45,14 +14,19 @@ class Fluid(object):
         self.x_velocity = self.__create_flat_array(0)
         self.y_velocity = self.__create_flat_array(0)
 
-    def __array(self, values: np.ndarray) -> Array2D:
+    def __array(self, array: np.ndarray) -> np.ndarray:
         """
-        Creates a flat 2D array from a predefined array of data.
+        Validity checks a variable array of fluid data.
         """
         
-        return Array2D(values, self.grid.dx, self.grid.dy)
+        # Ensure array shape is valid
+        if len(np.shape(array)) != 2:
+            raise ValueError("Array must contain two dimensions.")
+        
+        # Return valid array
+        return array
 
-    def __create_flat_array(self, value: float) -> Array2D:
+    def __create_flat_array(self, value: float) -> np.ndarray:
         """
         Creates a flat 2D array filled with a specifed value.
         """
@@ -63,7 +37,7 @@ class Fluid(object):
         # Return array
         return self.__array(array)
 
-    def _density(self, mass: Array2D) -> Array2D:
+    def _density(self, mass: np.ndarray) -> np.ndarray:
         """
         Calculates a density array using an array of cell masses.
         """
@@ -74,7 +48,8 @@ class Fluid(object):
         # Return as an array object
         return self.__array(density)
 
-    def _velocity(self, momentum: Array2D, density: Array2D) -> Array2D:
+    def _velocity(self, momentum: np.ndarray,
+                  density: np.ndarray) -> np.ndarray:
         """
         Calculates a partial velocity vector array using a partial momentum
         vector array and a density array.
@@ -86,8 +61,9 @@ class Fluid(object):
         # Return as an array object
         return self.__array(velocity)
 
-    def _pressure(self, energy: Array2D, density: Array2D, x_velocity: Array2D,
-                  y_velocity: Array2D) -> Array2D:
+    def _pressure(self, energy: np.ndarray, density: np.ndarray,
+                  x_velocity: np.ndarray,
+                  y_velocity: np.ndarray) -> np.ndarray:
         """
         Calculates the pressure array using the energy, density and velocity
         vector arrays.
@@ -100,8 +76,8 @@ class Fluid(object):
         # Return as an array object
         return self.__array(pressure)
 
-    def update_primitive(self, mass: Array2D, x_momentum: Array2D,
-                         y_momentum: Array2D, energy: Array2D) -> None:
+    def update_primitive(self, mass: np.ndarray, x_momentum: np.ndarray,
+                         y_momentum: np.ndarray, energy: np.ndarray) -> None:
         """
         Calculates and updates the primitive fluid variables using the
         provided conserved variables.
@@ -126,3 +102,6 @@ if __name__ == "__main__":
 
     # Instantiate fluid
     fluid = Fluid(grid, 5/3)
+    
+    fluid._density(np.full(fluid.grid.shape, 1))
+    fluid
