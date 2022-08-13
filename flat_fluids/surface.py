@@ -89,8 +89,15 @@ class Grid(object):
         # Determine the number of pixels in the largest dimension
         max_length = max(self.shape)
         
+        # Calculate cell length
+        cell_length = self.scale / max_length
+        
+        # Ensure value is valid
+        if cell_length <= 0:
+            raise ValueError("Cell length must be a positive number.")
+        
         # Return cell length
-        return self.scale / max_length
+        return cell_length
 
     def _cell_area(self) -> float:
         """
