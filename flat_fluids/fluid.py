@@ -39,7 +39,7 @@ class Fluid(object):
         self.grid = grid
         self.gamma = gamma
         
-        # Create 2D arrays of initial fluid variables
+        # Create 2D arrays of initial primitive fluid variables
         self.density = self.__create_flat_array(1.2)
         self.pressure = self.__create_flat_array(1.01325)
         self.x_velocity = self.__create_flat_array(0)
@@ -87,7 +87,7 @@ class Fluid(object):
         return self.__array(velocity)
 
     def _pressure(self, energy: Array2D, density: Array2D, x_velocity: Array2D,
-                  y_velocity: Array2D):
+                  y_velocity: Array2D) -> Array2D:
         """
         Calculates the pressure array using the energy, density and velocity
         vector arrays.
@@ -99,6 +99,25 @@ class Fluid(object):
         
         # Return as an array object
         return self.__array(pressure)
+
+    def update_primitive(self, mass: Array2D, x_momentum: Array2D,
+                         y_momentum: Array2D, energy: Array2D) -> None:
+        """
+        Calculates and updates the primitive fluid variables using the
+        provided conserved variables.
+        """
+        
+        # Calculate the new primitive variables
+        density = self._density(mass)
+        x_velocity = self._velocity(x_momentum, density)
+        y_velocity = self._velocity(y_momentum, density)
+        pressure = self._pressure(energy, density, x_velocity, y_velocity)
+        
+        # Update stored primitive variable values
+        self.density = density
+        self.x_velocity = x_velocity
+        self.y_velocity = y_velocity
+        self.pressure = pressure
 
 
 if __name__ == "__main__":
